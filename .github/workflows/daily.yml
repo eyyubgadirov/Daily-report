@@ -1,5 +1,8 @@
 name: Daily Auto Commit
 
+permissions:
+  contents: write
+
 on:
   schedule:
     - cron: "0 6 * * *"   # Hər gün 06:00 UTC
