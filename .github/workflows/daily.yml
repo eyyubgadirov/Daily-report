@@ -1,0 +1,26 @@
+name: Daily Auto Commit
+
+on:
+  schedule:
+    - cron: "0 6 * * *"   # Hər gün 06:00 UTC
+  workflow_dispatch:
+
+jobs:
+  auto-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Repo klonla
+        uses: actions/checkout@v4
+
+      - name: Fayla tarix yaz
+        run: |
+          echo "Update time: $(date)" >> daily.txt
+
+      - name: Commit və push et
+        run: |
+          git config --global user.name "eyyubgadirov"
+          git config --global user.email "your@email.com"
+          git add .
+          git commit -m "Daily auto commit"
+          git push
