@@ -1,11 +1,11 @@
-name: Daily Auto Commit
+name: Real Developer Activity
 
 permissions:
   contents: write
 
 on:
   schedule:
-    - cron: "0 6 * * *"   # Hər gün 06:00 UTC
+    - cron: "0 6 * * *"   # hər gün 10:00 AZ
   workflow_dispatch:
 
 jobs:
@@ -13,17 +13,42 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Repo klonla
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Fayla tarix yaz
-        run: |
-          echo "Update time: $(date)" >> daily.txt
-
-      - name: Commit və push et
+      - name: Generate realistic commits
         run: |
           git config --global user.name "eyyubgadirov"
           git config --global user.email "kadirofff5@outlook.com"
-          git add .
-          git commit -m "Daily auto commit"
+
+          DAY=$(date +%u)
+
+          if [ "$DAY" -le 5 ]; then
+            COUNT=$(( (RANDOM % 4) + 3 ))   # 3-6 commit (weekdays)
+          elif [ "$DAY" -eq 6 ]; then
+            COUNT=$(( (RANDOM % 3) + 1 ))   # 1-3 commit (Saturday)
+          else
+            COUNT=$(( RANDOM % 2 ))         # 0-1 commit (Sunday)
+          fi
+
+          echo "Today commit count: $COUNT"
+
+          for ((i=1;i<=COUNT;i++))
+          do
+            FILE="file_$((RANDOM % 3)).txt"
+            echo "Update $i - $(date +%s)" >> $FILE
+
+            git add .
+            git commit -m "$(shuf -n 1 -e \
+              'Refactor service logic' \
+              'Fix minor bug' \
+              'Improve validation' \
+              'Update configuration' \
+              'Optimize query' \
+              'Add logging' \
+              'Cleanup unused code' \
+              'Enhance error handling')"
+
+            sleep $(( (RANDOM % 5) + 2 ))
+          done
+
           git push
